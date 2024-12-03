@@ -1,0 +1,12 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: request-handler
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - image: 192.168.222.2:32000/request-handler:v1
+        ports:
+        - containerPort: 8080
