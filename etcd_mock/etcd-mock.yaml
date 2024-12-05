@@ -42,7 +42,7 @@ spec:
             - --data-dir /etcd-data
             - --listen-client-urls http://0.0.0.0:2379
             - --advertise-client-urls http://0.0.0.0:2379
-            - --auth-token=simple
+            # - --auth-token=simple
           volumeMounts:
             - name: etcd-data
               mountPath: /etcd-data
