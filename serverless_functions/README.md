@@ -1,10 +1,9 @@
 # Manual
 
-This README file contains all the templates of the functions as well as the method to deploy them (from source -> to docker image -> to deployment on k8s)
-
-## Notations
+This README file contains all the templates of the functions as well as the method to deploy them (from source -> to docker image -> to deployment on knative)
 
 Our image repository is located at `andreicalindragomir/serverless-krm`
+
 All images we store are stored under a `tag`. Each `tag` in our case is a serverless function.
 
 ## Deployment
@@ -59,4 +58,5 @@ spec:
             cpu: "250m"
 ```
 
+Lastly, you apply the new yaml (might need to use `--force` if the file was already applied before)
 
