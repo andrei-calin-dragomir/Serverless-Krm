@@ -58,5 +58,5 @@ spec:
             cpu: "250m"
 ```
 
-Lastly, you apply the new yaml (might need to use `--force` if the file was already applied before)
+Lastly, you apply the new yaml (might need to use `--force` if the file was already applied before).
 
