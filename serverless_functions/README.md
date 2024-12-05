@@ -49,6 +49,9 @@ spec:
         image: andreicalindragomir/serverless-krm:<function_name>
         ports:
         - containerPort: 8080
+        env:
+        - name: ETCD_PROXY_ADDR
+          value: "http://etcd-proxy.knative-serving.svc.cluster.local:2379"
         resources:
           limits:
             memory: "512Mi"
