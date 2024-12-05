@@ -11,11 +11,8 @@ RUN go mod download
 # Copy the source code
 COPY . .
 
-RUN ls -la /app
-RUN ls -la /app/cmd
-
 # Build the application
-RUN go build -o request-handler ./cmd/controller
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o job-dispatch ./cmd/controller
 
 # Use a minimal image for the runtime
 FROM gcr.io/distroless/static:nonroot
@@ -24,10 +21,10 @@ FROM gcr.io/distroless/static:nonroot
 WORKDIR /
 
 # Copy the built binary from the builder stage
-COPY --from=builder /app/request-handler .
+COPY --from=builder /app/job-dispatch /job-dispatch
 
 # Expose the port that the function listens on
 EXPOSE 8080
 
 # Set the entry point
-CMD ["/request-handler"]
+CMD ["/job-dispatch"]

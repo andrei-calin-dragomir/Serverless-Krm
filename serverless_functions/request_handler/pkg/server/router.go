@@ -2,7 +2,7 @@ package server
 
 import (
 	"net/http"
-	"serverless_functions/pkg/handlers"
+	"request_handler/pkg/handlers"
 )
 
 func SetupRouter() *http.ServeMux {

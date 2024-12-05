@@ -7,6 +7,8 @@ spec:
   template:
     spec:
       containers:
-      - image: 192.168.222.2:32000/request-handler:v1
+      - image: 192.168.222.3:32000/request-handler:v1
         ports:
         - containerPort: 8080
+      imagePullSecrets:
+      - name: regcred
