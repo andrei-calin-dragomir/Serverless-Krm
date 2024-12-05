@@ -32,6 +32,11 @@ docker push andreicalindragomir/serverless-krm:{function_name}
 
 In the deployment of each function:
 ```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: knative-control-plane
+---
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
@@ -50,8 +55,8 @@ spec:
         ports:
         - containerPort: 8080
         env:
-        - name: ETCD_PROXY_ADDR
-          value: "http://etcd-proxy.knative-serving.svc.cluster.local:2379"
+        - name: ETCD_ADDR
+          value: "http://etcd-service.knative-control-plane.svc.cluster.local:2379"
         resources:
           limits:
             memory: "512Mi"
