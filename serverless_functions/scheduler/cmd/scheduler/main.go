@@ -11,27 +11,29 @@ import (
 	"scheduler/internal/inbound"
 	"scheduler/internal/outbound"
 	"scheduler/internal/service"
+	"strings"
 	"syscall"
 	"time"
 )
 
-const (
-	DOMAIN = "localhost"
-	PORT   = 8082
-)
-
-// func init() {
-// 	// Configure the default global logger with log level
-// 	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-// 		Level:     slog.LevelInfo, // Set the minimum level to Info
-// 		AddSource: true,           // Include source information in logs
-// 	})
-// 	slog.SetDefault(slog.New(handler))
-// }
-
 var (
-	etcdEndpoints = []string{"localhost:2379"}
+	PORT           string
+	DOMAIN         string
+	ETCD_ENDPOINTS []string
 )
+
+func init() {
+	PORT = os.Getenv("PORT")
+	DOMAIN = os.Getenv("DOMAIN")
+	ETCD_ENDPOINTS = strings.Split(os.Getenv("ETCD_ENDPOINTS"), ",")
+	// fmt.Print(PORT)
+	// fmt.Print(DOMAIN)
+	// fmt.Print(ETCD_ENDPOINTS)
+}
+
+// var (
+// 	etcdEndpoints = []string{"localhost:2379"}
+// )
 
 func monitorEtcdConnection(client *outbound.ETCDClient) {
 	for {
@@ -49,7 +51,8 @@ func monitorEtcdConnection(client *outbound.ETCDClient) {
 }
 
 func main() {
-	etcdClient, err := outbound.NewETCDClient(etcdEndpoints, 5*time.Second) //, 10*time.Second)
+
+	etcdClient, err := outbound.NewETCDClient(ETCD_ENDPOINTS, 5*time.Second) //, 10*time.Second)
 	if err != nil {
 		log.Fatalf("Failed to initialize etcd client: %v", err)
 	}
@@ -58,17 +61,16 @@ func main() {
 	// Start a Goroutine to monitor connection status
 	go monitorEtcdConnection(etcdClient)
 
-	podBindService := service.NewPodBindService(etcdClient)
-	podBindHandler := inbound.NewPodBindHandler(podBindService)
+	schedulerService := service.NewSchedulerService(etcdClient)
+	schedulerHandler := inbound.NewSchedulerHandler(schedulerService)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /scheduler/podBind", podBindHandler.HandlePodBind)
+	mux.HandleFunc("POST /scheduler/pod", schedulerHandler.HandlePodBind)
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", DOMAIN, PORT),
+		Addr:    fmt.Sprintf("%s:%s", DOMAIN, PORT),
 		Handler: mux,
 	}
-
 	// Channel to listen for OS signals
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

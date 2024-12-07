@@ -1,0 +1,29 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: scheduler
+  namespace: knative-control-plane
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1" # Ensures at least one instance is always running
+    spec:
+      containers:
+        - image: andreicalindragomir/serverless-krm:scheduler
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: DOMAIN
+              value: "localhost"
+            - name: ETCD_ENDPOINTS
+              value: "localhost:2379"
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"

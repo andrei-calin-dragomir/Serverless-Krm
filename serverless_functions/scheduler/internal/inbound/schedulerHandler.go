@@ -10,16 +10,17 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-type NodeFilterHandler struct {
-	nodeFilterService *service.NodeFilterService
+type SchedulerHandler struct {
+	schedulerService *service.SchedulerService
 }
 
-func NewNodeFilterHandler(nodeFilterService *service.NodeFilterService) *NodeFilterHandler {
-	return &NodeFilterHandler{nodeFilterService: nodeFilterService}
+func NewSchedulerHandler(schedulerService *service.SchedulerService) *SchedulerHandler {
+	return &SchedulerHandler{
+		schedulerService: schedulerService,
+	}
 }
 
-func (nfh *NodeFilterHandler) HandleNodeFilter(w http.ResponseWriter, r *http.Request) {
-
+func (sh *SchedulerHandler) HandlePodBind(w http.ResponseWriter, r *http.Request) {
 	var pod corev1.Pod
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&pod); err != nil {
@@ -37,9 +38,8 @@ func (nfh *NodeFilterHandler) HandleNodeFilter(w http.ResponseWriter, r *http.Re
 
 	if pod.Spec.NodeName == "" {
 		slog.Info("pod is unassigned")
-		go nfh.nodeFilterService.FilterNodes(pod)
+		go sh.schedulerService.SchedulePod(pod)
 	} else {
 		slog.Info("pod is assigned", "nodename", pod.Spec.NodeName)
 	}
-
 }

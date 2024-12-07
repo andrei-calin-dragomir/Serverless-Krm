@@ -1,63 +1,10 @@
 package service
 
 import (
-	"fmt"
-	"log/slog"
 	"math"
-	"scheduler/internal/domain"
-	"scheduler/internal/outbound"
 
 	corev1 "k8s.io/api/core/v1"
 )
-
-const (
-	podBindURL = "http://localhost:8082/scheduler/podBind"
-)
-
-type NodeScoreService struct {
-	etcdClient *outbound.ETCDClient
-}
-
-func NewNodeScoreService(etcdClient *outbound.ETCDClient) *NodeScoreService {
-	return &NodeScoreService{
-		etcdClient: etcdClient,
-	}
-}
-
-func (s *NodeScoreService) ScoreNodes(filteredNodes domain.FilteredNodes) {
-	var scoredNodes domain.ScoredNodes
-	scoredNodes.Pod = filteredNodes.Pod
-
-	// Score each filtered node
-	for _, node := range filteredNodes.FilteredNodes {
-		score := calculateNodeScore(filteredNodes.Pod, node)
-		scoredNodes.ScoredNodes = append(scoredNodes.ScoredNodes, domain.ScoredNode{
-			Node:  node,
-			Score: score,
-		})
-	}
-
-	scoredNodes.SortByScore()
-
-	// Send scored nodes to pod binding function
-	if len(scoredNodes.ScoredNodes) > 0 {
-		fmt.Printf("%+v", scoredNodes)
-		fmt.Println((scoredNodes.ScoredNodes[0].Score))
-		fmt.Println((scoredNodes.ScoredNodes[1].Score))
-		fmt.Println((scoredNodes.ScoredNodes[2].Score))
-		resp, err := outbound.PostJSON(podBindURL, scoredNodes)
-		if err != nil {
-			slog.Error("Error sending scored nodes to pod binding function",
-				slog.Any("error", err),
-				slog.String("url", podBindURL),
-			)
-			return
-		}
-		slog.Info("Received response from pod binding function",
-			slog.Any("response", resp),
-		)
-	}
-}
 
 func calculateNodeScore(pod corev1.Pod, node corev1.Node) float64 {
 	// Calculate individual scores

@@ -1,14 +1,16 @@
 # To run
 ```
-go run cmd/xxxxxxxx/main.go
+go run cmd/scheduler/main.go
 ```
 
-* nodeFilter -> localhost:8080/scheduler/watchPod
-* nodeScore -> localhost:8081/scheduler/nodeScore
-* podBind -> localhost:8082/scheduler/podBind
+POST pod object on -> localhost:8080/scheduler/pod
 
-* scripts contain some scipts to install etcd, populate with dummy nodes
+the binded pod is updated in etcd and then /pods endpoint of kubelet api is hit getting its address from status.addresses.internalIP field in selected node object.
 
+KNATIVE service yaml file needs to have correct env variables
+
+-------------------------------
+ANY thing below this is dump
 
 # To Cover
 * etcd node fetch in memory caching
