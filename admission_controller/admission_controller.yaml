@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admission-controller
+  template:
+    metadata:
+      labels:
+        app: admission-controller
+    spec:
+      containers:
+        - name: webhook
+          image: andreicalindragomir/serverless-krm:admission-controller
+          ports:
+            - containerPort: 443
+          env:
+            - name: RECONCILER_URL
+              value: "localhost:8080/reconcile"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admission-controller-svc
+spec:
+  ports:
+    - port: 443
+      targetPort: 443
+  selector:
+    app: admission-controller

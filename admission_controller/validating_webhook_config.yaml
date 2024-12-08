@@ -1,0 +1,19 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: pod-update-webhook
+webhooks:
+  - name: boosted.kubernetes.com/pod-update-webhook
+    clientConfig:
+      service:
+        name: admission-controller-svc
+        namespace: default
+        path: /validate
+      #caBundle: <BASE64_ENCODED_CA_CERT>
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        operations: ["UPDATE"]
