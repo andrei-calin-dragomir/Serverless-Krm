@@ -1,0 +1,4 @@
+specVersion: 0.36.0
+name: pod-handler
+runtime: go
+created: 2024-12-05T19:40:47.753407021+01:00
